@@ -15,7 +15,7 @@ function Editor() {
     
     const [clients, setClients] = useState([]);
 
-    const codeRef = useRef(null);
+    const codeRef = useRef("");
     const socketRef = useRef(null);
     const location = useLocation();
     const {roomId} = useParams();
@@ -70,7 +70,7 @@ function Editor() {
             socketRef.current.off('joined');
             socketRef.current.off('disconnected');
         };
-    }, [roomId, location.state?.username, navigate]);
+    }, []);
 
     // Prevent rendering if user entered URL directly
     if(!location.state){
@@ -125,14 +125,10 @@ function Editor() {
                     <Console 
                         socketRef={socketRef}
                         roomId={roomId}
-                        onCodeChange={(code) => {
-                            // console.log(code);
-                            codeRef.current = code;
-                        }}
+                        onCodeChange={(code) => (codeRef.current = code)}
                     />
                 </div>
             </div>
-
         </div>
     </div>
   )

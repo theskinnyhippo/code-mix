@@ -10,13 +10,13 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
   const cmInstance = useRef(null);     // Ref to CodeMirror instance
 
   useEffect(() => {
-    const init = () => {
+    const init = async () => {
       if (!cmInstance.current) return;
 
       // Create CodeMirror instance
       const editor = CodeMirror.fromTextArea(
         
-        cmInstance.current = document.getElementById("rt-editor"), {
+        document.getElementById("rt-editor"), {
 
           mode: { name: "javascript", json: true },
           theme: "yonce",
@@ -31,21 +31,21 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
       cmInstance.current.setSize(null, "70%");
 
       // Apply wrapper styles
-      const cmElement = cmInstance.current.getWrapperElement();
-      cmElement.style.borderRadius = '12px';
-      cmElement.style.overflow = 'hidden';
-      cmElement.style.backgroundColor = '#1B1D23';
+      // const cmElement = cmInstance.current.getWrapperElement();
+      // cmElement.style.borderRadius = '12px';
+      // cmElement.style.overflow = 'hidden';
+      // cmElement.style.backgroundColor = '#1B1D23';
 
-      const gutters = cmElement.querySelector('.CodeMirror-gutters');
-      if (gutters) {
-        gutters.style.borderTopLeftRadius = '12px';
-        gutters.style.borderBottomLeftRadius = '12px';
-        gutters.style.overflow = 'hidden';
-      }
+      // const gutters = cmElement.querySelector('.CodeMirror-gutters');
+      // if (gutters) {
+      //   gutters.style.borderTopLeftRadius = '12px';
+      //   gutters.style.borderBottomLeftRadius = '12px';
+      //   gutters.style.overflow = 'hidden';
+      // }
 
       // Add change event listener
       cmInstance.current.on('change', (instance, changes) => {
-        console.log('changes', instance.getValue(), changes);
+        // console.log('changes', instance.getValue(), changes);
         
         const { origin } = changes;
         const code = instance.getValue();
@@ -68,18 +68,18 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
 
     if (socketRef.current) {
       socketRef.current.on('code-change', ({ code }) => {
-        if (code !== null) {
+        if (cmInstance.current) {
           cmInstance.current.setValue(code);
         }
       });
     }
 
     return () => {
-      // if (socketRef.current) {
+      if (socketRef.current) {
         socketRef.current.off('code-change');
-      // }
+      }
     };
-  }, [socketRef]); // Include socketRef in the dependency array
+  }, [socketRef.current]); // Include socketRef in the dependency array
 
 
 
