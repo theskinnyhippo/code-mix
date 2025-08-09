@@ -10,13 +10,13 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
   const cmInstance = useRef(null);     // Ref to CodeMirror instance
 
   useEffect(() => {
-    const init = () => {
+    const init = async () => {
       if (!cmInstance.current) return;
 
       // Create CodeMirror instance
       const editor = CodeMirror.fromTextArea(
-        
-        cmInstance.current = document.getElementById("rt-editor"), {
+
+        document.getElementById("rt-editor"), {
 
           mode: { name: "javascript", json: true },
           theme: "yonce",
@@ -28,7 +28,7 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
       cmInstance.current = editor;
 
       // Set size
-      cmInstance.current.setSize(null, "70%");
+      cmInstance.current.setSize(null, "100%");
 
       // Apply wrapper styles
       const cmElement = cmInstance.current.getWrapperElement();
@@ -45,7 +45,7 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
 
       // Add change event listener
       cmInstance.current.on('change', (instance, changes) => {
-        console.log('changes', instance.getValue(), changes);
+        // console.log('changes', instance.getValue(), changes);
         
         const { origin } = changes;
         const code = instance.getValue();
@@ -65,21 +65,27 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
 
 
   useEffect(() => {
+    let initialLoad = true;
 
     if (socketRef.current) {
-      socketRef.current.on('code-change', ({ code }) => {
-        if (code !== null) {
+      socketRef.current.on('code-change', ({ code, username }) => {
+        if (cmInstance.current) {
+          if(initialLoad){
+            cmInstance.current.setValue(code);
+            initialLoad = false;
+            return;
+          }
           cmInstance.current.setValue(code);
         }
       });
     }
 
     return () => {
-      // if (socketRef.current) {
+      if (socketRef.current) {
         socketRef.current.off('code-change');
-      // }
+      }
     };
-  }, [socketRef]); // Include socketRef in the dependency array
+  }, [socketRef.current]); 
 
 
 
