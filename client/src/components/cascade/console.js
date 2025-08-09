@@ -15,7 +15,6 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
 
       // Create CodeMirror instance
       const editor = CodeMirror.fromTextArea(
-        
         document.getElementById("rt-editor"), {
 
           mode: { name: "javascript", json: true },
@@ -28,20 +27,20 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
       cmInstance.current = editor;
 
       // Set size
-      cmInstance.current.setSize(null, "70%");
+      cmInstance.current.setSize(null, "100%");
 
       // Apply wrapper styles
-      // const cmElement = cmInstance.current.getWrapperElement();
-      // cmElement.style.borderRadius = '12px';
-      // cmElement.style.overflow = 'hidden';
-      // cmElement.style.backgroundColor = '#1B1D23';
+      const cmElement = cmInstance.current.getWrapperElement();
+      cmElement.style.borderRadius = '12px';
+      cmElement.style.overflow = 'hidden';
+      cmElement.style.backgroundColor = '#1B1D23';
 
-      // const gutters = cmElement.querySelector('.CodeMirror-gutters');
-      // if (gutters) {
-      //   gutters.style.borderTopLeftRadius = '12px';
-      //   gutters.style.borderBottomLeftRadius = '12px';
-      //   gutters.style.overflow = 'hidden';
-      // }
+      const gutters = cmElement.querySelector('.CodeMirror-gutters');
+      if (gutters) {
+        gutters.style.borderTopLeftRadius = '12px';
+        gutters.style.borderBottomLeftRadius = '12px';
+        gutters.style.overflow = 'hidden';
+      }
 
       // Add change event listener
       cmInstance.current.on('change', (instance, changes) => {
@@ -65,10 +64,16 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
 
 
   useEffect(() => {
+    let initialLoad = true;
 
     if (socketRef.current) {
-      socketRef.current.on('code-change', ({ code }) => {
+      socketRef.current.on('code-change', ({ code, username }) => {
         if (cmInstance.current) {
+          if(initialLoad){
+            cmInstance.current.setValue(code);
+            initialLoad = false;
+            return;
+          }
           cmInstance.current.setValue(code);
         }
       });
@@ -79,7 +84,8 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
         socketRef.current.off('code-change');
       }
     };
-  }, [socketRef.current]); // Include socketRef in the dependency array
+
+  }, [socketRef.current]); 
 
 
 

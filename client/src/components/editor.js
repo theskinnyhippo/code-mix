@@ -3,7 +3,7 @@ import Client from './cascade/client'
 import Console from './cascade/console'
 import { initSocket } from '../connection/socket';
 import {
-    Navigate, 
+    // Navigate, 
     useLocation, 
     useNavigate, 
     useParams 
@@ -40,16 +40,17 @@ function Editor() {
                 roomId, 
                 username : location.state?.username || "Anonymous"
             })
+
             socketRef.current.on('joined', ({clients, username, socketId}) => {
                 if(username !== location.state?.username){
                     toast(`${username} has joined the room`);
                 }
                 setClients(clients);
-                socketRef.current.emit('sync-code', {
-                    code : codeRef.current,
-                    socketId,
-                })
                 
+                // socketRef.current.emit('sync-code', {
+                //     code : codeRef.current,
+                //     socketId,
+                // })
             })
 
 
@@ -73,8 +74,25 @@ function Editor() {
     }, []);
 
     // Prevent rendering if user entered URL directly
-    if(!location.state){
-        return <Navigate to="/"/>
+    if(!location.state || !location.state.username) {
+        toast.error("Username is required to join the room");
+        navigate('/');
+    }
+
+
+    const copyRoomId = async () => {
+        try {
+            await navigator.clipboard.writeText(roomId);
+            toast.success('RoomID is copied to clipboard');
+        } catch (err) {
+            toast.error('Failed to copy Room ID');
+        }
+    }
+
+    const leave = () => {
+        socketRef.current.emit('leave', { roomId });
+        navigate('/');
+            toast.success('You have left the room');
     }
 
 
@@ -107,11 +125,17 @@ function Editor() {
 
             {/* Buttons at bottom */}
             <hr />
-            <div className="flex justify-around mt-4 mb-2 gap-x-2">
-            <button className="w-full shadow-md shadow-black bg-blue-300 hover:bg-amber-200 text-black px-4 py-2 ml-1 rounded-l-xl font-mono text-sm">
+            <div className="flex justify-around mt-4 mb-2 mx-3">
+            <button 
+                className="w-full shadow-md mx-1 bg-blue-300 hover:bg-amber-200 text-black px-4 py-2 rounded-l-xl font-mono text-sm"
+                onClick={copyRoomId}
+            >
                 <p>Copy link</p>
             </button>
-            <button className="w-full shadow-md shadow-black bg-red-500 hover:bg-amber-200 text-black px-4 py-2 mr-1 rounded-r-xl font-mono text-sm">
+            <button 
+                className="w-full shadow-md mx-1 bg-red-500 hover:bg-amber-200 text-black px-4 py-2 rounded-r-xl font-mono text-sm"
+                onClick={leave}    
+            >
                 Leave
             </button>
             </div>
@@ -125,7 +149,7 @@ function Editor() {
                     <Console 
                         socketRef={socketRef}
                         roomId={roomId}
-                        onCodeChange={(code) => (codeRef.current = code)}
+                        onCodeChange={(code) => (codeRef.current = code)}   
                     />
                 </div>
             </div>
