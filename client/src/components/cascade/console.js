@@ -15,7 +15,6 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
 
       // Create CodeMirror instance
       const editor = CodeMirror.fromTextArea(
-
         document.getElementById("rt-editor"), {
 
           mode: { name: "javascript", json: true },
@@ -85,6 +84,7 @@ const Console = ({ socketRef, roomId, onCodeChange }) => {
         socketRef.current.off('code-change');
       }
     };
+
   }, [socketRef.current]); 
 
 
