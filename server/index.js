@@ -31,6 +31,11 @@ const getAllConnectedClients = (roomId) => {
     );
 };
 
+app.get('/', (req, res) => {
+    console.log("connected to backend");
+    res.json("welcome to the server");
+});
+
 io.on('connection', (socket) => {
     
     console.log(`user connected: ${socket.id}`);
