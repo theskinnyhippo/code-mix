@@ -66,7 +66,7 @@ io.on('connection', (socket) => {
 
     socket.on('code-change', ({ roomId, code }) => {
       roomCodeMap[roomId] = code;
-      console.log(`[CODE-CHANGE] room=${roomId} stored code:`, code);
+    //   console.log(`[CODE-CHANGE] room=${roomId} stored code:`, code);
         socket.in(roomId).emit('code-change', { 
             code,
             username : userSocketMap[socket.id] || 'Anonymous'
