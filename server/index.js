@@ -3,11 +3,23 @@ const http = require("http");
 const { Server } = require("socket.io");
 
 const app = express();
+
+const cors = require("cors");
+
+app.use(cors({
+    origin : 'https://code-mix.vercel.app/',
+    credentials : true,
+    optionsSuccessStatus : 200,
+    methods : [
+        "GET", "POST", "DELETE", "OPTIONS"
+    ],    
+    allowedHeaders : ["Content-Type", "Authorization"]
+}));
+
 const server = http.createServer(app);
 const io = new Server(server);
 
 const userSocketMap = {};
-
 const roomCodeMap = {};
 
 const getAllConnectedClients = (roomId) => {
@@ -18,6 +30,11 @@ const getAllConnectedClients = (roomId) => {
         })
     );
 };
+
+app.get('/', (req, res) => {
+    console.log("connected to backend");
+    res.json("welcome to the server");
+});
 
 io.on('connection', (socket) => {
     
