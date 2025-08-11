@@ -4,7 +4,8 @@ const { Server } = require("socket.io");
 
 const app = express();
 
-const cors = require("cors")
+const cors = require("cors");
+
 app.use(cors({
     origin : 'https://code-mix.vercel.app/',
     credentials : true,
@@ -13,7 +14,7 @@ app.use(cors({
         "GET", "POST", "DELETE", "OPTIONS"
     ],    
     allowedHeaders : ["Content-Type", "Authorization"]
-}))
+}));
 
 const server = http.createServer(app);
 const io = new Server(server);
