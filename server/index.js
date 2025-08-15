@@ -5,6 +5,7 @@ const { Server } = require("socket.io");
 const app = express();
 
 const cors = require("cors");
+const runRouter = require("./api/run");
 
 app.use(cors({
     origin : 'https://code-mix.vercel.app/',
@@ -15,6 +16,9 @@ app.use(cors({
     ],    
     allowedHeaders : ["Content-Type", "Authorization"]
 }));
+
+app.use(express.json({ limit: "1mb" }));
+app.use("/api/run", runRouter);
 
 const server = http.createServer(app);
 const io = new Server(server);
@@ -66,7 +70,7 @@ io.on('connection', (socket) => {
 
     socket.on('code-change', ({ roomId, code }) => {
       roomCodeMap[roomId] = code;
-      console.log(`[CODE-CHANGE] room=${roomId} stored code:`, code);
+    //   console.log(`[CODE-CHANGE] room=${roomId} stored code:`, code);
         socket.in(roomId).emit('code-change', { 
             code,
             username : userSocketMap[socket.id] || 'Anonymous'
