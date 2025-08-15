@@ -65,6 +65,7 @@ const Console = ({ socketRef, roomId, onCodeChange, language, setLanguage }) => 
       onCodeChange(code);
       if (origin !== 'setValue') {
         socketRef.current?.emit('code-change', { roomId, code });
+
       }
     });
   }, []);

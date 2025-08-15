@@ -157,7 +157,6 @@ function Editor() {
                     />
                 </div>
             </div>
-
         </div>
     </div>
   )
