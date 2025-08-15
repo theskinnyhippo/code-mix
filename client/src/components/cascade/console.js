@@ -1,99 +1,139 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/yonce.css";
 import "codemirror/mode/javascript/javascript";
+import "codemirror/mode/python/python";
+import "codemirror/mode/clike/clike"; // C/C++/Java/Go
 import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import CodeMirror from "codemirror";
 
-const Console = ({ socketRef, roomId, onCodeChange }) => {
-  const cmInstance = useRef(null);     // Ref to CodeMirror instance
+const modeMap = {
+  'c':         { name: "text/x-csrc" },
+  'c++':       { name: "text/x-c++src" },
+  'java':      { name: "text/x-java" },
+  'javascript':{ name: "javascript", json: true },
+  'python':    { name: "python", version: 3 },
+  'go':        { name: "text/x-go" },
+};
 
+const Console = ({ socketRef, roomId, onCodeChange, language, setLanguage }) => {
+  
+  const cmEditor  = useRef(null);
+  const cmInput   = useRef(null);
+  const cmOutput  = useRef(null);
+
+  const createMirror = (id, readOnly = false) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const editor = CodeMirror.fromTextArea(el, {
+      mode: modeMap[language],
+      theme: "yonce",
+      autoCloseTags: true,
+      autoCloseBrackets: true,
+      lineNumbers: true,
+      readOnly,
+    });
+
+    editor.setSize(null, "100%");
+    const wrap = editor.getWrapperElement();
+    wrap.style.borderRadius = '12px';
+    wrap.style.overflow = 'hidden';
+    wrap.style.backgroundColor = '#1B1D23';
+
+    const gutters = wrap.querySelector('.CodeMirror-gutters');
+    if (gutters) {
+      gutters.style.borderTopLeftRadius = '12px';
+      gutters.style.borderBottomLeftRadius = '12px';
+      gutters.style.overflow = 'hidden';
+    }
+    return editor;
+  };
+
+  /* initialise */
   useEffect(() => {
-    const init = async () => {
-      if (!cmInstance.current) return;
+    cmEditor.current = createMirror("rt-editor");
+    cmInput.current  = createMirror("rt-stdin");
+    cmOutput.current = createMirror("rt-output", true);
 
-      // Create CodeMirror instance
-      const editor = CodeMirror.fromTextArea(
-
-        document.getElementById("rt-editor"), {
-
-          mode: { name: "javascript", json: true },
-          theme: "yonce",
-          autoCloseTags: true,
-          autoCloseBrackets: true,
-          lineNumbers: true,
-      });
-
-      cmInstance.current = editor;
-
-      // Set size
-      cmInstance.current.setSize(null, "100%");
-
-      // Apply wrapper styles
-      const cmElement = cmInstance.current.getWrapperElement();
-      cmElement.style.borderRadius = '12px';
-      cmElement.style.overflow = 'hidden';
-      cmElement.style.backgroundColor = '#1B1D23';
-
-      const gutters = cmElement.querySelector('.CodeMirror-gutters');
-      if (gutters) {
-        gutters.style.borderTopLeftRadius = '12px';
-        gutters.style.borderBottomLeftRadius = '12px';
-        gutters.style.overflow = 'hidden';
+    cmEditor.current.on('change', (instance, changes) => {
+      const { origin } = changes;
+      const code = instance.getValue();
+      onCodeChange(code);
+      if (origin !== 'setValue') {
+        socketRef.current?.emit('code-change', { roomId, code });
       }
-
-      // Add change event listener
-      cmInstance.current.on('change', (instance, changes) => {
-        // console.log('changes', instance.getValue(), changes);
-        
-        const { origin } = changes;
-        const code = instance.getValue();
-        onCodeChange(code);
-
-        if(origin !== 'setValue'){
-          socketRef.current.emit('code-change', {
-            roomId, 
-            code
-          })
-        }
-      });
-    };
-
-    init();
+    });
   }, []);
 
-
+  /* language change */
   useEffect(() => {
-    let initialLoad = true;
+    if (cmEditor.current) cmEditor.current.setOption("mode", modeMap[language]);
+  }, [language]);
 
-    if (socketRef.current) {
-      socketRef.current.on('code-change', ({ code, username }) => {
-        if (cmInstance.current) {
-          if(initialLoad){
-            cmInstance.current.setValue(code);
-            initialLoad = false;
-            return;
-          }
-          cmInstance.current.setValue(code);
-        }
-      });
-    }
+  /* remote sync */
+  useEffect(() => {
+    const onRemote = ({ code }) => cmEditor.current?.setValue(code);
+    socketRef.current?.on('code-change', onRemote);
+    return () => socketRef.current?.off('code-change', onRemote);
+  }, [socketRef.current]);
 
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.off('code-change');
-      }
-    };
-  }, [socketRef.current]); 
 
+  // handle code submit
+//   const submitCode = async () => {
+//     const stdin = cmInput.current?.getValue() || '';
+//     const code = cmEditor.current?.getValue() || '';
+//     const lang = modeMap[language];
+//     const res  = await fetch('http://localhost:5000/api/run', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify({ lang, code, input: stdin })
+//     });
+//     const { output } = await res.json();
+//     cmOutput.current?.setValue(output);
+//  };
 
 
   return (
-    <div className="h-full w-full p-4">
-      <textarea id="rt-editor" ref={cmInstance} />
+    <div className="h-full w-full flex">
+      <div className="w-[60%] h-full py-4 pl-4">
+        <textarea id="rt-editor" />
+      </div>
+
+      <div className="w-[40%] h-full flex flex-col gap-4 p-4">
+        <div className="h-[46%]">
+          <textarea id="rt-stdin" className='' placeholder="stdin" />
+        </div>
+
+        <div className="h-[5%] flex items-center gap-2">
+          <button 
+            className="h-full px-4 bg-black rounded-lg shadow-sm shadow-white hover:bg-green-950 text-white font-mono font-bold"
+            onClick={submitCode}  
+          >
+            RUN
+          </button>
+
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="h-full px-2 bg-black text-white rounded-lg shadow-sm shadow-white font-mono text-sm"
+          >
+            <option value="c">c</option>
+            <option value="c++">c++</option>
+            <option value="java">java</option>
+            <option value="javascript">javascript</option>
+            <option value="python">python</option>
+            <option value="go">go</option>
+          </select>
+        </div>
+
+        <div className="h-[47%]">
+          <textarea id="rt-output" placeholder="output" />
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default Console;

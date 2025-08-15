@@ -95,6 +95,8 @@ function Editor() {
             toast.success('You have left the room');
     }
 
+    const [language, setLanguage] = useState("c++");
+
 
   return (
     <div className="relative w-full h-screen overflow-hidden">
@@ -149,7 +151,9 @@ function Editor() {
                     <Console 
                         socketRef={socketRef}
                         roomId={roomId}
-                        onCodeChange={(code) => (codeRef.current = code)}                    
+                        onCodeChange={(code) => (codeRef.current = code)}    
+                        language={language}
+                        setLanguage={setLanguage}                
                     />
                 </div>
             </div>
