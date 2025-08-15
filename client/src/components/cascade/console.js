@@ -57,6 +57,8 @@ const Console = ({ socketRef, roomId, onCodeChange, language, setLanguage }) => 
     cmInput.current  = createMirror("rt-stdin");
     cmOutput.current = createMirror("rt-output", true);
 
+    cmInput.current.setValue("/*not yet functional*/");
+
     cmEditor.current.on('change', (instance, changes) => {
       const { origin } = changes;
       const code = instance.getValue();
@@ -81,18 +83,24 @@ const Console = ({ socketRef, roomId, onCodeChange, language, setLanguage }) => 
 
 
   // handle code submit
-//   const submitCode = async () => {
-//     const stdin = cmInput.current?.getValue() || '';
-//     const code = cmEditor.current?.getValue() || '';
-//     const lang = modeMap[language];
-//     const res  = await fetch('http://localhost:5000/api/run', {
-//       method: 'POST',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify({ lang, code, input: stdin })
-//     });
-//     const { output } = await res.json();
-//     cmOutput.current?.setValue(output);
-//  };
+const submitCode = async () => {
+  const stdin = cmInput.current?.getValue() || '';
+  const code  = cmEditor.current?.getValue() || '';
+
+  const res = await fetch('https://code-mix-hidden.onrender.com/api/run', {
+  // const res = await fetch('http://localhost:5000/api/run', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ language, code, stdin })
+  });
+
+  // console.log(stdin);
+  
+  const { output } = await res.json();
+  cmOutput.current?.setValue(output);
+  
+  // console.log(output);
+};
 
 
   return (
@@ -108,7 +116,7 @@ const Console = ({ socketRef, roomId, onCodeChange, language, setLanguage }) => 
 
         <div className="h-[5%] flex items-center gap-2">
           <button 
-            className="h-full px-4 bg-black rounded-lg shadow-sm shadow-white hover:bg-green-950 text-white font-mono font-bold"
+            className="h-full w-1/2 px-4 bg-black rounded-lg shadow-sm shadow-white hover:bg-green-950 text-white font-mono font-bold"
             onClick={submitCode}  
           >
             RUN
@@ -117,7 +125,7 @@ const Console = ({ socketRef, roomId, onCodeChange, language, setLanguage }) => 
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="h-full px-2 bg-black text-white rounded-lg shadow-sm shadow-white font-mono text-sm"
+            className="h-full w-1/2 px-2 bg-black text-white rounded-lg shadow-sm shadow-white font-mono text-sm"
           >
             <option value="c">c</option>
             <option value="c++">c++</option>
