@@ -1,3 +1,5 @@
+//api payload example
+
 const axios = require("axios");
 
 (async () => {
@@ -9,5 +11,5 @@ const axios = require("axios");
     run_timeout: 5000,
     run_memory_limit: 128 * 1024 * 1024,
   });
-  console.log(res.data.run.output); // -> "5\n"
+  console.log(res.data.run.output);
 })();

@@ -57,7 +57,6 @@ const Console = ({ socketRef, roomId, onCodeChange, language, setLanguage }) => 
     cmInput.current  = createMirror("rt-stdin");
     cmOutput.current = createMirror("rt-output", true);
 
-    cmInput.current.setValue("/*not yet functional*/");
 
     cmEditor.current.on('change', (instance, changes) => {
       const { origin } = changes;
@@ -88,19 +87,22 @@ const submitCode = async () => {
   const stdin = cmInput.current?.getValue() || '';
   const code  = cmEditor.current?.getValue() || '';
 
-  const res = await fetch('https://code-mix-hidden.onrender.com/api/run', {
-  // const res = await fetch('http://localhost:5000/api/run', {
+  const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/run`, {  //
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ language, code, stdin })
+    body: JSON.stringify({ 
+      language, 
+      code, 
+      input : stdin 
+    })
   });
 
-  // console.log(stdin);
+  console.log(stdin);
   
   const { output } = await res.json();
-  cmOutput.current?.setValue(output);
+  cmOutput.current?.setValue(output ?? ""); 
   
-  // console.log(output);
+  console.log(output);
 };
 
 
