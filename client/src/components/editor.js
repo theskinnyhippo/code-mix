@@ -126,20 +126,52 @@ function Editor() {
             </div>
 
             {/* Buttons at bottom */}
+            // <hr />
+            // <div className="flex justify-around mt-4 mb-2 mx-3">
+            // <button 
+            //     className="w-full shadow-md mx-1 bg-blue-300 hover:bg-amber-200 text-black px-4 py-2 rounded-l-xl font-mono text-sm"
+            //     onClick={copyRoomId}
+            // >
+            //     <p>Copy link</p>
+            // </button>
+            // <button 
+            //     className="w-full shadow-md mx-1 bg-red-500 hover:bg-amber-200 text-black px-4 py-2 rounded-r-xl font-mono text-sm"
+            //     onClick={leave}    
+            // >
+            //     Leave
+            // </button>
+            // </div>
             <hr />
-            <div className="flex justify-around mt-4 mb-2 mx-3">
-            <button 
-                className="w-full shadow-md mx-1 bg-blue-300 hover:bg-amber-200 text-black px-4 py-2 rounded-l-xl font-mono text-sm"
+            <div className="flex justify-around mt-2 mb-0 mx-0">
+              <button
                 onClick={copyRoomId}
-            >
+                className="
+                  w-1/2 mx-2 
+                  bg-[radial-gradient(at_50%_5%,_theme(colors.teal.500),_theme(colors.black))] 
+                  hover:bg-[radial-gradient(at_50%_55%,_theme(colors.teal.900),_theme(colors.black))] 
+                  shadow-md shadow-black hover:shadow-gray-700 
+                  text-white hover:text-gray-400 
+                  font-bold px-4 py-2 
+                  rounded-full font-sans text-sm
+                "
+              >
                 <p>Copy link</p>
-            </button>
-            <button 
-                className="w-full shadow-md mx-1 bg-red-500 hover:bg-amber-200 text-black px-4 py-2 rounded-r-xl font-mono text-sm"
-                onClick={leave}    
-            >
+              </button>
+            
+              <button
+                onClick={leave}
+                className="
+                  w-1/2 mx-2 
+                  bg-[radial-gradient(at_50%_5%,_theme(colors.red.600),_theme(colors.black))] 
+                  hover:bg-[radial-gradient(at_50%_55%,_theme(colors.red.900),_theme(colors.black))] 
+                  shadow-md shadow-black hover:shadow-gray-700 
+                  text-white hover:text-gray-400 
+                  font-bold px-4 py-2 
+                  rounded-full font-sans text-sm
+                "
+              >
                 Leave
-            </button>
+              </button>
             </div>
         </div>
 
