@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+require("dotenv").config();
 
 const app = express();
 
@@ -8,7 +9,7 @@ const cors = require("cors");
 const runRouter = require("./api/run");
 
 app.use(cors({
-    origin : 'https://code-mix.vercel.app/',
+    origin : process.env.CLIENT_URL,
     credentials : true,
     optionsSuccessStatus : 200,
     methods : [
@@ -21,7 +22,17 @@ app.use(express.json({ limit: "1mb" }));
 app.use("/api/run", runRouter);
 
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    cors : {
+        origin : process.env.CLIENT_URL,
+        credentials : true,
+        optionsSuccessStatus : 200,
+        methods : [
+            "GET", "POST", "DELETE", "OPTIONS"
+        ],    
+        allowedHeaders : ["Content-Type", "Authorization"]
+    }
+});
 
 const userSocketMap = {};
 const roomCodeMap = {};

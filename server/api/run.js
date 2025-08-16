@@ -50,12 +50,15 @@ router.post("/", async (req, res) => {
       timeout: 6000,
     });
 
-    res.json({
-      output:   data.run.output,
-      code:     data.run.code,
-      language: data.language,
-      version:  data.version,
-    });
+res.json({
+  output: data.run?.output 
+       ?? data.run?.stdout 
+       ?? data.run?.stderr 
+       ?? "No output",
+  code: data.run?.code ?? "",
+  language: data.language,
+  version: data.version,
+});
   } catch (err) {
     console.error("[/api/run] error:", err.message);
     res.status(500).json({ error: "Execution failed" });
