@@ -129,13 +129,13 @@ function Editor() {
             <hr />
             <div className="flex justify-around mt-2 mb-0 mx-0">
                 <button
-                className="w-1/2 mx-2 bg-[radial-gradient(at_50%_5%,_theme(colors.teal.500),_theme(colors.black))] hover:bg-[radial-gradient(at_50%_55%,_theme(colors.teal.900),_theme(colors.black))] shadow-md shadow-black hover:shadow-gray-700 text-white hover:text-gray-400 font-bold px-4 py-2 rounded-full font-sans text-sm"
+                className="w-1/2 mx-2 bg-[radial-gradient(at_50%_5%,_theme(colors.teal.500),_theme(colors.black))] hover:bg-[radial-gradient(at_50%_55%,_theme(colors.teal.900),_theme(colors.black))] shadow-md shadow-black hover:shadow-gray-700 text-white hover:text-gray-400 font-bold px-4 py-2 rounded-full font-sans text-sm hover:text-xs"
                 onClick={copyRoomId}
                 >
                     <p>Link</p>
                 </button>
                 <button
-                className="w-1/2 mx-2 bg-[radial-gradient(at_50%_5%,_theme(colors.red.600),_theme(colors.black))] hover:bg-[radial-gradient(at_50%_55%,_theme(colors.red.900),_theme(colors.black))] shadow-md shadow-black hover:shadow-gray-700 text-white hover:text-gray-400 font-bold px-4 py-2 rounded-full font-sans text-sm"
+                className="w-1/2 mx-2 bg-[radial-gradient(at_50%_5%,_theme(colors.red.600),_theme(colors.black))] hover:bg-[radial-gradient(at_50%_55%,_theme(colors.red.900),_theme(colors.black))] shadow-md shadow-black hover:shadow-gray-700 text-white hover:text-gray-400 font-bold px-4 py-2 rounded-full font-sans text-sm hover:text-xs"
                 onClick={leave}
                 >
                     Leave
